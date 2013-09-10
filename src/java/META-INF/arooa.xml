@@ -1,0 +1,15 @@
+<arooa:descriptor  xmlns:arooa="http://rgordon.co.uk/oddjob/arooa"
+        prefix="groovy" namespace="oddjob:groovy">
+    <conversions>
+        <value value='org.oddjob.groovy.GroovyExpression$Conversions'/>
+    </conversions>
+	<values>
+		<arooa:bean-def element='expression'
+		    className='org.oddjob.groovy.GroovyExpression'
+            designFactory='org.oddjob.groovy.GroovyExpressionDF'/>
+	</values>
+	<components>
+    	<arooa:bean-def element='script'
+    	    className='org.oddjob.groovy.GroovyJob'/>
+	</components>
+</arooa:descriptor>

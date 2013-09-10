@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<oddjob>
+    <job>
+        <sequential>
+            <jobs>
+                <variables id="vars">
+                    <result>
+                        <groovy:expression expression="2 + 2" xmlns:groovy="oddjob:groovy"/>
+                    </result>
+                </variables>
+                <echo id="echo"><![CDATA[${vars.result}]]></echo>
+            </jobs>
+        </sequential>
+    </job>
+</oddjob>
