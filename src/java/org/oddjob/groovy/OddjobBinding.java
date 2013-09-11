@@ -10,6 +10,8 @@ public class OddjobBinding extends Binding {
 
 	public static final String ODDJOB_SESSION_INTERFACE_BINDING = "osi";
 	
+	public static final String ODDJOB_LOGGER_BINDING = "logger";
+	
 	public static final String ODDJOB_RESULT_BINDING = "oddjobResult";
 	
 	protected BeanRegistry beanRegistry;

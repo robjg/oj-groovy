@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.oddjob.arooa.ArooaSession;
 
 public class OddjobWriteBinding extends OddjobBinding {
@@ -11,8 +12,9 @@ public class OddjobWriteBinding extends OddjobBinding {
 	private Set<Object> registered = Collections.synchronizedSet(
 			new HashSet<Object>());
 	
-	public OddjobWriteBinding(ArooaSession session) {
+	public OddjobWriteBinding(ArooaSession session, Logger logger) {
 		super(session);
+		super.setVariable(ODDJOB_LOGGER_BINDING, logger);
 	}
 
 	@Override

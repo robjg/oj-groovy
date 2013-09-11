@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<oddjob>
+    <job>
+        <sequential>
+            <jobs>
+                <variables id="vars">
+                    <fruit>
+                        <value value="Apple"/>
+                    </fruit>
+                </variables>
+                <groovy:script id="groovy" xmlns:groovy="oddjob:groovy"><![CDATA[// Groovy can access variables
+Object fruit = vars.fruit
+// Variables are always a type of ArooaValue
+// this will be ValueType
+println fruit.getClass()
+// We can convert using Oddjob Session Interface
+println  osi.lookup("vars.fruit", String.class)
+// Groovy can set variables.
+vars.foo='Foo'
+// These aren't ArooaValues.
+println vars.foo.getClass()]]></groovy:script>
+            </jobs>
+        </sequential>
+    </job>
+</oddjob>

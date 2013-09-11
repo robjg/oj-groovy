@@ -9,6 +9,7 @@ import org.oddjob.ConsoleCapture;
 import org.oddjob.Oddjob;
 import org.oddjob.OddjobLookup;
 import org.oddjob.Resetable;
+import org.oddjob.arooa.types.ValueType;
 import org.oddjob.state.ParentState;
 
 public class GroovyJobTest extends TestCase {
@@ -74,4 +75,33 @@ public class GroovyJobTest extends TestCase {
 		
 		oddjob.destroy();
 	}
+	
+	public void testGroovyAndVariables() {
+		
+		File file = new File(getClass().getResource(
+				"GroovyAndVariables.xml").getFile());
+		
+		Oddjob oddjob = new Oddjob();
+		oddjob.setFile(file);
+		
+		ConsoleCapture capture = new ConsoleCapture();
+		capture.capture(Oddjob.CONSOLE);
+		
+		oddjob.run();
+		
+		assertEquals(ParentState.COMPLETE, 
+				oddjob.lastStateEvent().getState());
+		
+		capture.close();
+		
+		String[] lines = capture.getLines();
+		
+		assertEquals("" + ValueType.class, lines[0].trim());
+		assertEquals("Apple", lines[1].trim());
+		assertEquals("" + String.class, lines[2].trim());
+		
+		oddjob.destroy();
+	}
+	
+	
 }

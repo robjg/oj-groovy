@@ -4,6 +4,7 @@ import groovy.lang.GroovyShell;
 
 import java.util.concurrent.Callable;
 
+import org.apache.log4j.Logger;
 import org.oddjob.arooa.ArooaSession;
 import org.oddjob.arooa.deploy.annotations.ArooaHidden;
 import org.oddjob.arooa.deploy.annotations.ArooaText;
@@ -14,6 +15,8 @@ import org.oddjob.framework.SoftReset;
 
 public class GroovyJob implements Callable<Integer>, ArooaSessionAware {
 
+	private static final Logger logger = Logger.getLogger(GroovyJob.class);
+	
 	private OddjobWriteBinding binding;
 	
 	private String name;
@@ -25,7 +28,7 @@ public class GroovyJob implements Callable<Integer>, ArooaSessionAware {
 	@ArooaHidden
 	@Override
 	public void setArooaSession(ArooaSession session) {
-		binding = new OddjobWriteBinding(session);
+		binding = new OddjobWriteBinding(session, logger);
 	}
 	
 	@Override
