@@ -1,5 +1,7 @@
 package org.oddjob.groovy;
 
+import javax.inject.Inject;
+
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 
@@ -50,6 +52,8 @@ public class GroovyExpression implements ArooaValue, ArooaSessionAware {
 	
 	private ArooaSession session;
 	
+	private ClassLoader classLoader;
+	
 	private String expression;
 	
 	@ArooaHidden
@@ -66,7 +70,7 @@ public class GroovyExpression implements ArooaValue, ArooaSessionAware {
 		
 		Binding binding = new OddjobBinding(session);
 		
-		return new GroovyShell(binding).evaluate(expression);
+		return new GroovyShell(classLoader, binding).evaluate(expression);
 	}
 	
 	public void setExpression(String expression) {
@@ -77,8 +81,18 @@ public class GroovyExpression implements ArooaValue, ArooaSessionAware {
 		return expression;
 	}
 	
+	public ClassLoader getClassLoader() {
+		return classLoader;
+	}
+
+	@Inject
+	public void setClassLoader(ClassLoader classLoader) {
+		this.classLoader = classLoader;
+	}
+	
 	@Override
 	public String toString() {
 		return expression;
 	}
+
 }

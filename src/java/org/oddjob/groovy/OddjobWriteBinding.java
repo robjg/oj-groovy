@@ -7,8 +7,17 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.oddjob.arooa.ArooaSession;
 
+/**
+ * 
+ * @author rob
+ *
+ */
 public class OddjobWriteBinding extends OddjobBinding {
 
+	public static final String ODDJOB_LOGGER_BINDING = "logger";
+	
+	public static final String ODDJOB_RESULT_BINDING = "oddjobResult";
+	
 	private Set<Object> registered = Collections.synchronizedSet(
 			new HashSet<Object>());
 	

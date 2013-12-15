@@ -6,13 +6,17 @@ import groovy.lang.MissingPropertyException;
 import org.oddjob.arooa.ArooaSession;
 import org.oddjob.arooa.registry.BeanRegistry;
 
+/**
+ * A binding that allows Groovy access to objects registered in Oddjob. 
+ * This binding also exposes an {@link OddjobSessionInterface} object
+ * to Groovy via the special property <code>osi</code>.
+ * 
+ * @author rob
+ *
+ */
 public class OddjobBinding extends Binding {
 
 	public static final String ODDJOB_SESSION_INTERFACE_BINDING = "osi";
-	
-	public static final String ODDJOB_LOGGER_BINDING = "logger";
-	
-	public static final String ODDJOB_RESULT_BINDING = "oddjobResult";
 	
 	protected BeanRegistry beanRegistry;
 

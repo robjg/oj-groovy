@@ -4,6 +4,8 @@ import groovy.lang.GroovyShell;
 
 import java.util.concurrent.Callable;
 
+import javax.inject.Inject;
+
 import org.apache.log4j.Logger;
 import org.oddjob.arooa.ArooaSession;
 import org.oddjob.arooa.deploy.annotations.ArooaHidden;
@@ -13,11 +15,29 @@ import org.oddjob.arooa.life.Destroy;
 import org.oddjob.framework.HardReset;
 import org.oddjob.framework.SoftReset;
 
+/**
+ * @oddjob.description Execute a Groovy Script.
+ * 
+ * In addition to the <code>osi</code> available to {@link GroovyExpression},
+ * The logger is made available to the script with the variable <code>logger</code>
+ * and an integer result for this job, which will affect it's completion
+ * state, can be set by setting the variable <code>oddjobResult</code>.
+ * 
+ * @author rob
+ *
+ */
 public class GroovyJob implements Callable<Integer>, ArooaSessionAware {
 
 	private static final Logger logger = Logger.getLogger(GroovyJob.class);
 	
 	private OddjobWriteBinding binding;
+	
+	/**
+	 * @oddjob.proeprty
+	 * @oddjob.description The class loader for the script to use.
+	 * @oddjob.required No, set by Oddjob.
+	 */
+	private ClassLoader classLoader;
 	
 	private String name;
 	
@@ -38,13 +58,13 @@ public class GroovyJob implements Callable<Integer>, ArooaSessionAware {
 			throw new NullPointerException("No script.");
 		}
 		
-		GroovyShell shell = new GroovyShell(binding);
+		GroovyShell shell = new GroovyShell(classLoader, binding);
 
 		evalResult = shell.evaluate(script);
 		
-		if (binding.hasVariable(OddjobBinding.ODDJOB_RESULT_BINDING)) {
+		if (binding.hasVariable(OddjobWriteBinding.ODDJOB_RESULT_BINDING)) {
 			Object result = binding.getVariable(
-					OddjobBinding.ODDJOB_RESULT_BINDING);
+					OddjobWriteBinding.ODDJOB_RESULT_BINDING);
 			if (result instanceof Number) {
 				return ((Number) result).intValue();
 			}
@@ -81,6 +101,15 @@ public class GroovyJob implements Callable<Integer>, ArooaSessionAware {
 		return name;
 	}
 	
+	public ClassLoader getClassLoader() {
+		return classLoader;
+	}
+
+	@Inject
+	public void setClassLoader(ClassLoader classLoader) {
+		this.classLoader = classLoader;
+	}
+	
 	@Override
 	public String toString() {
 		if (name == null) {
@@ -90,4 +119,5 @@ public class GroovyJob implements Callable<Integer>, ArooaSessionAware {
 			return name;
 		}
 	}
+
 }
