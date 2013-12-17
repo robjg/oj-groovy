@@ -4,8 +4,6 @@ import groovy.lang.GroovyShell;
 
 import java.util.concurrent.Callable;
 
-import javax.inject.Inject;
-
 import org.apache.log4j.Logger;
 import org.oddjob.arooa.ArooaSession;
 import org.oddjob.arooa.deploy.annotations.ArooaHidden;
@@ -35,7 +33,7 @@ public class GroovyJob implements Callable<Integer>, ArooaSessionAware {
 	/**
 	 * @oddjob.proeprty
 	 * @oddjob.description The class loader for the script to use.
-	 * @oddjob.required No, set by Oddjob.
+	 * @oddjob.required No.
 	 */
 	private ClassLoader classLoader;
 	
@@ -105,7 +103,6 @@ public class GroovyJob implements Callable<Integer>, ArooaSessionAware {
 		return classLoader;
 	}
 
-	@Inject
 	public void setClassLoader(ClassLoader classLoader) {
 		this.classLoader = classLoader;
 	}

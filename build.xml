@@ -354,6 +354,11 @@
 				 <include name="${name}*.jar"/>
 			</fileset>
 		</delete>
+		<delete>
+			<fileset dir="${test.dir}/classloader">
+				 <include name="*.class"/>
+			</fileset>
+		</delete>
 	</target>
 
 </project>

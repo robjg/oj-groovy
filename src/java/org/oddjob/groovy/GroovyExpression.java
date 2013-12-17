@@ -1,7 +1,5 @@
 package org.oddjob.groovy;
 
-import javax.inject.Inject;
-
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 
@@ -17,6 +15,12 @@ import org.oddjob.arooa.convert.Joker;
 import org.oddjob.arooa.deploy.annotations.ArooaHidden;
 import org.oddjob.arooa.life.ArooaSessionAware;
 
+/**
+ * @oddjob.description A Groovy expression.
+ * 
+ * @author rob
+ *
+ */
 public class GroovyExpression implements ArooaValue, ArooaSessionAware {
 
 	public static class Conversions implements ConversionProvider {
@@ -52,8 +56,6 @@ public class GroovyExpression implements ArooaValue, ArooaSessionAware {
 	
 	private ArooaSession session;
 	
-	private ClassLoader classLoader;
-	
 	private String expression;
 	
 	@ArooaHidden
@@ -70,7 +72,7 @@ public class GroovyExpression implements ArooaValue, ArooaSessionAware {
 		
 		Binding binding = new OddjobBinding(session);
 		
-		return new GroovyShell(classLoader, binding).evaluate(expression);
+		return new GroovyShell(binding).evaluate(expression);
 	}
 	
 	public void setExpression(String expression) {
@@ -79,15 +81,6 @@ public class GroovyExpression implements ArooaValue, ArooaSessionAware {
 	
 	public String getExpression() {
 		return expression;
-	}
-	
-	public ClassLoader getClassLoader() {
-		return classLoader;
-	}
-
-	@Inject
-	public void setClassLoader(ClassLoader classLoader) {
-		this.classLoader = classLoader;
 	}
 	
 	@Override
