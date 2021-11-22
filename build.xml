@@ -1,5 +1,9 @@
 <project default="jar" basedir="." name="OJ-Groovy" xmlns:ivy="antlib:org.apache.ivy.ant">
 
+	<taskdef resource="org/apache/ivy/ant/antlib.xml"
+			 uri="antlib:org.apache.ivy.ant"
+			 classpath="../oj-assembly/antlibs/ivy-2.5.0.jar"/>
+
 	<!-- =================================================================== -->
 	<!-- Initialization target                                               -->
 	<!-- =================================================================== -->
@@ -49,6 +53,13 @@
 		<property name="build.docs"       value="${build.dir}/docs"/>
 		<property name="build.docs.api"   value="${build.docs}/api"/>
 
+		<property name="oddball.dir"		value="${build.dir}/oddball"/>
+		<property name="oddball.lib"    	value="${oddball.dir}/lib"/>
+
+		<property name="build.tests" 		value="${build.dir}/test-classes"/>
+
+		<property name="test.reports" 		value="${build.dir}/test-reports"/>
+
 		<property name="jar.name"        value="${name}-${build.version}.jar"/>
 
 		<property name="dist.dir"        value="${build.dir}/dist"/>
@@ -66,43 +77,30 @@
 		<filter token="userguide" value="../userguide"/>
 		<filter token="devguide" value="../devguide"/>
 
-		<!-- =================================================================== -->
-		<!-- Identify Classpath                                                 -->
-		<!-- =================================================================== -->
-
-		<path id="classpath">
-			<fileset dir="${lib.dir}">
-				<include name="*.jar"/>
-				<exclude name="${name}*.jar"/>
-			</fileset>
-			<fileset file="${oddjob.src}/run-oddjob.jar"/>
-			<fileset dir="${oddjob.src}/lib">
-				<include name="*.jar"/>
-			</fileset>
-		</path>
-
-		<path id="test-classpath">
-			<path refid="classpath"/>
-			<pathelement path="${build.classes}" />
-			<pathelement location="${oddjob.src}/build/tools/classes"/>
-			<fileset dir="${oddjob.src}/test/lib">
-				<include name="*.jar"/>
-			</fileset>
-			<fileset dir="${oddjob.src}/opt/lib">
-				<include name="*.jar"/>
-			</fileset>
-		</path>
-
 	</target>
 
 	<!-- =================================================================== -->
-	<!-- Prepares the build directory                                        -->
+	<!-- Prepare for the build                                               -->
 	<!-- =================================================================== -->
 	<target name="prepare" depends="init">
 
 		<mkdir dir="${build.dir}"/>
 
-		<ivy:retrieve />
+		<ivy:cachepath pathid="default-cachepath" conf="default" />
+
+		<ivy:cachepath pathid="provided-cachepath" conf="provided" />
+
+		<ivy:cachepath pathid="test-cachepath" conf="test" />
+
+		<path id="classpath">
+			<path refid="default-cachepath"/>
+			<path refid="provided-cachepath"/>
+		</path>
+
+		<path id="test-classpath">
+			<pathelement path="${build.classes}" />
+			<path refid="test-cachepath"/>
+		</path>
 	
 	</target>
 
@@ -163,11 +161,15 @@
 	<!-- =================================================================== -->
 	<target name="jar" depends="compile-tests" description="Generates the jar packages">
 		
-	    <jar destfile="${lib.dir}/${jar.name}"
+		<mkdir dir="${oddball.dir}"/>
+
+		<jar destfile="${oddball.lib}/${jar.name}"
 	         basedir="${build.classes}">
 	      <metainf dir="${build.dir}" includes="LICENSE.txt"/>
 	    </jar>
-		
+
+		<ivy:retrieve pattern="${oddball.lib}/[artifact]-[revision].[ext]" conf="default" />
+
 	</target>
 
 	<!-- =================================================================== -->

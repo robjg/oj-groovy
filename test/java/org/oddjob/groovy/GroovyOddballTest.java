@@ -1,23 +1,31 @@
 package org.oddjob.groovy;
 
-import java.io.File;
-
-import junit.framework.TestCase;
-
-import org.apache.log4j.Logger;
-import org.oddjob.Oddjob;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.oddjob.OddjobSrc;
 import org.oddjob.OurDirs;
-import org.oddjob.arooa.convert.ArooaConversionException;
 import org.oddjob.arooa.reflect.ArooaPropertyException;
 import org.oddjob.io.FilesType;
 import org.oddjob.launch.Launcher;
 import org.oddjob.tools.ConsoleCapture;
 import org.oddjob.util.URLClassLoaderType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class GroovyOddballTest extends TestCase {
+import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Path;
+import java.util.Objects;
 
-	private static final Logger logger = 
-			Logger.getLogger(GroovyOddballTest.class);
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+@Ignore // Todo Integration tests
+public class GroovyOddballTest {
+
+	private static final Logger logger =
+			LoggerFactory.getLogger(GroovyOddballTest.class);
 	
 	OurDirs dirs;
 	
@@ -25,33 +33,25 @@ public class GroovyOddballTest extends TestCase {
 	
 	String oddball;
 	
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		
+	@Before
+	public void setUp() throws Exception {
+
 		dirs = new OurDirs();
 		
 		oddball = dirs.base().getPath();
-		
-		String oddjobSrc = System.getProperty("oddjob.src");
-		File oddjobSrcDir;
-		if (oddjobSrc == null) {
-			oddjobSrcDir = dirs.relative("../oddjob");
-		}
-		else {
-			oddjobSrcDir = new File(oddjobSrc);
-		}
-		
-		logger.info("Oddjob Home is " + oddjobSrcDir); 
+
+		Path oddjobApp = OddjobSrc.oddjobApp();
+
+		logger.info("Oddjob Home is " + oddjobApp);
 		
 		FilesType lib = new FilesType();
-		lib.setFiles(oddjobSrcDir + "/lib/*.jar");
+		lib.setFiles(oddjobApp + "/lib/*.jar");
 		
 		FilesType opt = new FilesType();
-		opt.setFiles(oddjobSrcDir + "/opt/lib/*.jar");
+		opt.setFiles(oddjobApp + "/opt/lib/*.jar");
 				
 		FilesType tools = new FilesType();
-		tools.setFiles(oddjobSrcDir + "/build/tools/*.jar");
+		tools.setFiles(oddjobApp + "/build/tools/*.jar");
 		
 		FilesType files = new FilesType();
 		files.setList(0,  new File[] { dirs.relative("test/logging") } );
@@ -67,81 +67,73 @@ public class GroovyOddballTest extends TestCase {
 		oddjobLoader = classLoaderType.toValue();
 		
 	}
-	
-	public void testExpressionAsAnOddball() throws ArooaPropertyException, ArooaConversionException {
+
+	@Test
+	public void testExpressionAsAnOddball() throws ArooaPropertyException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
 		
-		File file = new File(getClass().getResource(
-				"GroovyExpressionSimple.xml").getFile());
+		File file = new File(Objects.requireNonNull(getClass().getResource(
+				"GroovyExpressionSimple.xml")).getFile());
 		
-		Launcher launcher = new Launcher();
-		launcher.setArgs(new String[] 
-				{ "-op", oddball, "-f", file.getPath() });
-		launcher.setClassLoader(oddjobLoader);
-		launcher.setClassName(Launcher.ODDJOB_MAIN_CLASS);
+		Launcher launcher = new Launcher(oddjobLoader, Launcher.ODDJOB_MAIN_CLASS,
+				new String[]
+						{ "-op", oddball, "-f", file.getPath() });
 
 		ConsoleCapture console = new ConsoleCapture();
-		console.capture(Oddjob.CONSOLE);
-		
-		launcher.run();
-		
-		console.close();
-		
+		try (ConsoleCapture.Close ignored = console.captureConsole()) {
+			launcher.launch();
+		}
+
 		console.dump(logger);
 		
 		String[] lines = console.getLines();
 
-		assertEquals("4", lines[0].trim());
-		assertEquals(1, lines.length);
+		assertThat(lines[0].trim(), is("4"));
+		assertThat(lines.length, is(1));
 	}
 	
-	public void testJobAsAnOddball() throws ArooaPropertyException, ArooaConversionException {
+	@Test
+	public void testJobAsAnOddball() throws ArooaPropertyException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
 		
-		File file = new File(getClass().getResource(
-				"GroovyJobHello.xml").getFile());
+		File file = new File(Objects.requireNonNull(getClass().getResource(
+				"GroovyJobHello.xml")).getFile());
 		
-		Launcher launcher = new Launcher();
-		launcher.setArgs(new String[] 
-				{ "-op", oddball, "-f", file.getPath() });
-		launcher.setClassLoader(oddjobLoader);
-		launcher.setClassName(Launcher.ODDJOB_MAIN_CLASS);
+		Launcher launcher = new Launcher(oddjobLoader, Launcher.ODDJOB_MAIN_CLASS,
+				new String[]
+						{ "-op", oddball, "-f", file.getPath() });
 
 		ConsoleCapture console = new ConsoleCapture();
-		console.capture(Oddjob.CONSOLE);
-		
-		launcher.run();
-		
-		console.close();
-		
+		try (ConsoleCapture.Close ignored = console.captureConsole()) {
+
+			launcher.launch();
+		}
+
 		console.dump(logger);
 		
 		String[] lines = console.getLines();
 
-		assertEquals("Hello From Groovy", lines[0].trim());
-		assertEquals(1, lines.length);
+		assertThat(lines[0].trim(), is("Hello From Groovy"));
+		assertThat(lines.length, is(1));
 	}
-	
-	public void testJobWithClassLoader() throws ArooaPropertyException, ArooaConversionException {
+
+	@Test
+	public void testJobWithClassLoader() throws ArooaPropertyException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
 		
 		File file = dirs.relative("test/classloader/GroovyWithClassLoader.xml");
 		
-		Launcher launcher = new Launcher();
-		launcher.setArgs(new String[] 
-				{ "-op", oddball, "-f", file.getPath() });
-		launcher.setClassLoader(oddjobLoader);
-		launcher.setClassName(Launcher.ODDJOB_MAIN_CLASS);
+		Launcher launcher = new Launcher(oddjobLoader, Launcher.ODDJOB_MAIN_CLASS,
+				new String[] { "-op", oddball, "-f", file.getPath() });
 
 		ConsoleCapture console = new ConsoleCapture();
-		console.capture(Oddjob.CONSOLE);
-		
-		launcher.run();
-		
-		console.close();
-		
+		try (ConsoleCapture.Close ignored =  console.captureConsole()) {
+
+			launcher.launch();
+		}
+
 		console.dump(logger);
 		
 		String[] lines = console.getLines();
 
-		assertEquals("The apple is red", lines[0].trim());
-		assertEquals(1, lines.length);
+		assertThat(lines[0].trim(), is("The apple is red"));
+		assertThat(lines.length, is(1));
 	}
 }

@@ -1,0 +1,49 @@
+plugins {
+    id 'java-library'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/java']
+        }
+        resources {
+            srcDirs = ['src/java']
+        }
+    }
+    test {
+        java {
+            srcDirs = ['test/java']
+        }
+        resources {
+            srcDirs = ['test/java']
+        }
+    }
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+ext {
+    oddjob_version = '1.6-SNAPSHOT'
+    log4j_version = '1.2.17'
+    junit_version = '4.13.1'
+}
+
+dependencies {
+
+    implementation group: 'uk.co.rgordon', name: 'oddjob', version: oddjob_version
+
+    implementation group: 'log4j', name: 'log4j', version: log4j_version
+
+    api group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.1.6'
+
+    testImplementation group: 'junit', name: 'junit', version: junit_version
+
+    testImplementation group: 'uk.co.rgordon', name: 'arooa', version: oddjob_version, classifier: 'tests'
+
+    testImplementation group: 'uk.co.rgordon', name: 'run-oddjob', version: oddjob_version
+}
+

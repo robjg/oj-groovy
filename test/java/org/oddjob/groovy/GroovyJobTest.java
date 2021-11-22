@@ -1,13 +1,14 @@
 package org.oddjob.groovy;
 
 import java.io.File;
+import java.util.Objects;
 
 import junit.framework.TestCase;
 
 import org.apache.log4j.Logger;
 import org.oddjob.Oddjob;
 import org.oddjob.OddjobLookup;
-import org.oddjob.Resetable;
+import org.oddjob.Resettable;
 import org.oddjob.arooa.types.ValueType;
 import org.oddjob.state.ParentState;
 import org.oddjob.tools.ConsoleCapture;
@@ -32,14 +33,13 @@ public class GroovyJobTest extends TestCase {
 		oddjob.setFile(file);
 		
 		ConsoleCapture capture = new ConsoleCapture();
-		capture.capture(Oddjob.CONSOLE);
+		try (ConsoleCapture.Close ignored = capture.captureConsole()) {
+
+			oddjob.run();
+		}
 		
-		oddjob.run();
-		
-		assertEquals(ParentState.COMPLETE, 
+		assertEquals(ParentState.COMPLETE,
 				oddjob.lastStateEvent().getState());
-		
-		capture.close();
 		
 		String[] lines = capture.getLines();
 		
@@ -52,8 +52,8 @@ public class GroovyJobTest extends TestCase {
 	
 	public void testGroovySettingInRegistry() {
 		
-		File file = new File(getClass().getResource(
-				"GroovyJobSetting.xml").getFile());
+		File file = new File(Objects.requireNonNull(getClass().getResource(
+				"GroovyJobSetting.xml")).getFile());
 		
 		Oddjob oddjob = new Oddjob();
 		oddjob.setFile(file);
@@ -69,7 +69,7 @@ public class GroovyJobTest extends TestCase {
 		
 		Object test = lookup.lookup("groovy");
 
-		((Resetable) test).hardReset();
+		((Resettable) test).hardReset();
 		
 		assertEquals(null, lookup.lookup("greeting"));
 		
@@ -85,15 +85,14 @@ public class GroovyJobTest extends TestCase {
 		oddjob.setFile(file);
 		
 		ConsoleCapture capture = new ConsoleCapture();
-		capture.capture(Oddjob.CONSOLE);
+		try (ConsoleCapture.Close ignored = capture.captureConsole()) {
+
+			oddjob.run();
+		}
 		
-		oddjob.run();
-		
-		assertEquals(ParentState.COMPLETE, 
+		assertEquals(ParentState.COMPLETE,
 				oddjob.lastStateEvent().getState());
-		
-		capture.close();
-		
+
 		String[] lines = capture.getLines();
 		
 		assertEquals("" + ValueType.class, lines[0].trim());

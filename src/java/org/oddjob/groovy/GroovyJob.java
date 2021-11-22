@@ -10,8 +10,8 @@ import org.oddjob.arooa.deploy.annotations.ArooaHidden;
 import org.oddjob.arooa.deploy.annotations.ArooaText;
 import org.oddjob.arooa.life.ArooaSessionAware;
 import org.oddjob.arooa.life.Destroy;
-import org.oddjob.framework.HardReset;
-import org.oddjob.framework.SoftReset;
+import org.oddjob.framework.adapt.HardReset;
+import org.oddjob.framework.adapt.SoftReset;
 
 /**
  * @oddjob.description Execute a Groovy Script.
