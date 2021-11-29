@@ -16,6 +16,8 @@
 		<!-- Properties                                                          -->
 		<!-- =================================================================== -->
 
+		<property file="../oj-assembly/version.properties"/>
+
 		<property name="Name"     value="OJ-Groovy"/>
 		<property name="name"     value="oj-groovy"/>
 		<property name="build.version"  value="0.0.0"/>
@@ -39,17 +41,14 @@
 		<!-- <property name="build.compiler" value="classic"/> -->
 
 		<property name="src.dir"      value="./src"/>
-		<property name="java.dir"     value="${src.dir}/java"/>
-		<property name="test.dir"     value="./test"/>
-		<property name="test.src"     value="${test.dir}/java"/>
-		<property name="work.dir"     value="./work"/>
-		<property name="lib.dir"      value="./lib"/>
+		<property name="main.java"        	value="${src.dir}/main/java"/>
+		<property name="main.resources"   	value="${src.dir}/main/resources"/>
+		<property name="test.java"        	value="${src.dir}/test/java"/>
+		<property name="test.resources"   	value="${src.dir}/test/resources"/>
 
 		<property name="build.dir"        value="./build"/>
 		<property name="build.src"        value="${build.dir}/src"/>
-		<property name="build.test"       value="${build.dir}/test"/>
 		<property name="build.classes"    value="${build.dir}/classes"/>
-		<property name="build.lib"        value="${build.dir}/lib"/>
 		<property name="build.docs"       value="${build.dir}/docs"/>
 		<property name="build.docs.api"   value="${build.docs}/api"/>
 
@@ -113,18 +112,7 @@
 		<mkdir dir="${build.src}"/>
 		<mkdir dir="${build.classes}"/>
 		<copy todir="${build.src}" filtering="on">
-			<fileset dir="${java.dir}">
-				<exclude name="**/*.gif"/>
-				<exclude name="**/*.properties"/>
-				<exclude name="**/*.xml"/>
-			</fileset>
-		</copy>
-		<copy todir="${build.src}" filtering="off">
-			<fileset dir="${java.dir}">
-				<include name="**/*.gif"/>
-				<include name="**/*.properties"/>
-				<include name="**/*.xml"/>
-			</fileset>
+			<fileset dir="${main.java}"/>
 		</copy>
 	</target>
 
@@ -136,15 +124,14 @@
           description="Compiles the source code">
 
 		<copy todir="${build.classes}">
-			<fileset dir="${build.src}">
-				<include name="**/*.gif"/>
-				<include name="**/*.properties"/>
-				<include name="**/*.xml"/>
-				<include name="**/*.txt"/>
-			</fileset>
+			<fileset dir="${main.resources}"/>
 		</copy>
 
 		<echo message="Compiling with Java ${ant.java.version}, debug ${debug}, optimize ${optimize}, deprecation ${deprecation}"/>
+
+		<pathconvert property="classpathProp" refid="classpath"/>
+
+		<echo>Classpath is ${classpathProp}</echo>
 
 		<javac srcdir="${build.src}"
            destdir="${build.classes}"
@@ -165,7 +152,10 @@
 
 		<jar destfile="${oddball.lib}/${jar.name}"
 	         basedir="${build.classes}">
-	      <metainf dir="${build.dir}" includes="LICENSE.txt"/>
+			<metainf dir=".">
+				<include name="LICENSE.txt"/>
+				<include name="NOTICE.txt"/>
+			</metainf>
 	    </jar>
 
 		<ivy:retrieve pattern="${oddball.lib}/[artifact]-[revision].[ext]" conf="default" />
@@ -177,23 +167,19 @@
 	<!-- =================================================================== -->
 	
 	<target name="compile-tests" depends="compile" description="Compile jUnit tests">
-		<mkdir dir="${build.test}"/>
 
-		<copy todir="${build.test}" filtering="off">
-			<fileset dir="${test.src}">
-				<include name="**/*.xml"/>
-				<include name="**/*.properties"/>
-				<include name="**/*.txt"/>
-			</fileset>
+		<copy todir="${build.tests}" filtering="off">
+			<fileset dir="${test.resources}"/>
 		</copy>
 		
 		<!-- Compile tests -->
-		<javac srcdir="${test.src}"
-            destdir="${build.test}"
+		<javac srcdir="${test.java}"
+            destdir="${build.tests}"
             debug="${debug}"
             optimize="${optimize}"
             deprecation="${deprecation}">
 			<classpath>
+				<pathelement path="${build.classes}" />
 				<path refid="test-classpath"/>
 			</classpath>
 		</javac>
@@ -201,34 +187,43 @@
 	</target>
 
 	<target name="all-tests" depends="jar" description="Perform jUnit tests">
-		<mkdir dir="${work.dir}"/>
+		<mkdir dir="${test.reports}"/>
 		
-		<junit printsummary="yes" haltonfailure="yes" fork="yes">
+		<junit printsummary="yes" haltonfailure="no"
+				failureproperty="junit.failure" fork="yes" forkMode="once">
 			<classpath>
-				<pathelement location="${build.test}" />
+				<pathelement location="${build.tests}" />
 			</classpath>
 			<classpath refid="test-classpath"/>
-			<formatter type="plain" usefile="no" />
-			<batchtest>
-				<fileset dir="${build.test}">
+			<batchtest todir="${test.reports}">
+				<fileset dir="${build.tests}">
 					<include name="**/test/*TestCase.class"/>
 					<include name="**/*Test.class" />
 					<exclude name="**/AllTest.class" />
 					<exclude name="**/*$$*Test.class" />
 				</fileset>
 			</batchtest>
+			<formatter type="xml"/>
 			<sysproperty key="basedir" value="${basedir}"/>
 			<sysproperty key="oddjob.home" value="${oddjob.home}"/>
 			<sysproperty key="ant.file" value="${ant.file}"/>
 		</junit>
+
+		<junitreport todir="${test.reports}">
+			<fileset dir="${test.reports}">
+		    	<include name="TEST-*.xml"/>
+			</fileset>
+		    <report todir="${test.reports}"/>
+		</junitreport>
+
+		<fail if="junit.failure" message="Unit test(s) failed. See reports in ${test.reports}."/>
 	</target>
 
 	<target name="single-test" depends="jar" description="Single JUnit test">
-		<mkdir dir="${work.dir}"/>
 			
 		<junit printsummary="yes" haltonfailure="yes" fork="yes">
 			<classpath>
-				<pathelement location="${build.test}" />
+				<pathelement location="${build.tests}" />
 			</classpath>
 			<classpath refid="test-classpath"/>
 			<formatter type="plain" usefile="no" />
@@ -238,7 +233,14 @@
 			<sysproperty key="ant.file" value="${ant.file}"/>
 		</junit>
 	</target>
-	
+
+	<!-- =================================================================== -->
+	<!-- Publish the jars in local ivy                                       -->
+	<!-- =================================================================== -->
+	<target name="install" depends="jar">
+
+	</target>
+
 	<!-- =================================================================== -->
 	<!-- Prepares the source distribution                                    -->
 	<!-- =================================================================== -->
@@ -280,27 +282,26 @@
 	<!-- =================================================================== -->
 	<!-- Prepares the source distribution                                    -->
 	<!-- =================================================================== -->
-	<target name="dist-src" depends="init"
-          description="Prepares the source distribution">
+	<target name="dist-src" depends="init" if="dist.src.dir"
+			description="Prepares the source distribution">
 
-		<mkdir dir="${dist.src.dir}"/>
+		<property name="to.dir" value="${dist.src.dir}/${name}"/>
 		
-		<property name="to.src.dir" value="${dist.src.dir}/${name}"/>
-		
-		<copy todir="${to.src.dir}/src" filtering="off">
+		<copy todir="${to.dir}/src" filtering="off">
 			<fileset dir="${src.dir}"/>
 		</copy>
 
-		<copy todir="${to.src.dir}/test">
-			<fileset dir="${test.dir}"/>
-		</copy>
-
-		<copy todir="${to.src.dir}">
+		<copy todir="${to.dir}">
 			<fileset dir=".">
-				<include name="ivy.xml"/>
 				<include name="build.xml"/>
+				<include name="ivy.xml"/>
+                <include name="ivysettings.xml"/>
 				<include name="LICENSE.txt"/>
-				<include name="README.txt"/>
+				<include name="NOTICE.txt"/>
+				<include name="README.md"/>
+				<include name="build.gradle"/>
+				<include name="gradlew"/>
+				<include name="gradlew.bat"/>
 			</fileset>
 		</copy>
 
@@ -309,29 +310,15 @@
 	<!-- =================================================================== -->
 	<!-- Prepares the binary distribution                                    -->
 	<!-- =================================================================== -->
-	<target name="dist-bin" depends="jar, javadoc">
+	<target name="dist-bin" depends="jar" if="dist.bin.dir"
+			description="Prepares the binary distribution.">
 		
-		<mkdir dir="${dist.bin.dir}"/>
-		
-		<property name="to.bin.dir" value="${dist.bin.dir}/${name}"/>
+		<property name="to.dir" value="${dist.bin.dir}/oddballs/${name}"/>
 
-		<!-- And now the jars -->
-		<copy todir="${to.bin.dir}/lib">
-			<fileset dir="${lib.dir}">
-				<include name="*.jar"/>
-			</fileset>
+		<copy todir="${to.dir}">
+			<fileset dir="${oddball.dir}"/>
 		</copy>
 
-		<copy todir="${to.bin.dir}/docs">
-			<fileset dir="${build.docs}"/>
-		</copy>
-
-		<copy todir="${to.bin.dir}">
-			<fileset dir=".">
-				<include name="LICENSE.txt"/>
-				<include name="README.txt"/>
-			</fileset>
-		</copy>
 	</target>
 	
 	<!-- =================================================================== -->
@@ -352,12 +339,7 @@
 	<target name="clean" depends="init" description="Cleans the build directories">
 		<delete dir="${build.dir}"/>
 		<delete>
-			<fileset dir="${lib.dir}">
-				 <include name="${name}*.jar"/>
-			</fileset>
-		</delete>
-		<delete>
-			<fileset dir="${test.dir}/classloader">
+			<fileset dir="${src.dir}/test/classloader">
 				 <include name="*.class"/>
 			</fileset>
 		</delete>

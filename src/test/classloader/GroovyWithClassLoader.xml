@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<oddjob id="this">
+    <job>
+        <sequential>
+            <jobs>
+                <bean class="org.oddjob.tools.CompileJob">
+                    <files>
+                        <files files="${this.dir}/*.java"/>
+                    </files>
+                </bean>
+                <groovy:script id="groovy-job" xmlns:groovy="oddjob:groovy">
+                    <classLoader>
+                        <url-class-loader>
+                            <files>
+                                <files files="${this.dir}"/>
+                            </files>
+                            <parent>
+                                <value value="${groovy-job.class.classLoader}"/>
+                            </parent>
+                        </url-class-loader>
+                    </classLoader><![CDATA[def apple = new Apple()
+println "The apple is " + apple.colour]]></groovy:script>
+            </jobs>
+        </sequential>
+    </job>
+</oddjob>

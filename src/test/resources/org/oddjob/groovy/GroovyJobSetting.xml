@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<oddjob>
+    <job>
+        <sequential>
+            <jobs>
+                <groovy:script id="groovy" xmlns:groovy="oddjob:groovy"><![CDATA[greeting = 'Hello From Groovy'
+]]></groovy:script>
+                <echo><![CDATA[${greeting}]]></echo>
+            </jobs>
+        </sequential>
+    </job>
+</oddjob>

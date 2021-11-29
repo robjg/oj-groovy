@@ -2,25 +2,6 @@ plugins {
     id 'java-library'
 }
 
-sourceSets {
-    main {
-        java {
-            srcDirs = ['src/java']
-        }
-        resources {
-            srcDirs = ['src/java']
-        }
-    }
-    test {
-        java {
-            srcDirs = ['test/java']
-        }
-        resources {
-            srcDirs = ['test/java']
-        }
-    }
-}
-
 repositories {
     mavenLocal()
     mavenCentral()

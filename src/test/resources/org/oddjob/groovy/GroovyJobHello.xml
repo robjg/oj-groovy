@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<oddjob>
+    <job>
+        <groovy:script xmlns:groovy="oddjob:groovy"><![CDATA[println 'Hello From Groovy'
+]]></groovy:script>
+    </job>
+</oddjob>

@@ -1,0 +1,6 @@
+Oddjob Groovy Jobs
+Copyright 2007-Present R Gordon Ltd
+
+This product includes software developed by the
+Groovy Project (http://groovy.codehaus.org).
+
