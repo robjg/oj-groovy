@@ -5,17 +5,18 @@ import java.util.Objects;
 
 import junit.framework.TestCase;
 
-import org.apache.log4j.Logger;
 import org.oddjob.Oddjob;
 import org.oddjob.OddjobLookup;
 import org.oddjob.Resettable;
 import org.oddjob.arooa.types.ValueType;
 import org.oddjob.state.ParentState;
 import org.oddjob.tools.ConsoleCapture;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GroovyJobTest extends TestCase {
 
-	private static final Logger logger = Logger.getLogger(GroovyJobTest.class);
+	private static final Logger logger = LoggerFactory.getLogger(GroovyJobTest.class);
 	
 	@Override
 	protected void setUp() throws Exception {

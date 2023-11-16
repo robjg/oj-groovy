@@ -7,20 +7,23 @@ repositories {
     mavenCentral()
 }
 
+group "uk.co.rgordon"
+version "0.2.0"
+
 ext {
-    oddjob_version = '1.6-SNAPSHOT'
-    groovy_version = '3.0.9'
-    log4j_version = '1.2.17'
-    junit_version = '4.13.1'
+    oddjob_version = '1.6.0'
+    groovy_version = '4.0.15'
+    slf4j_version = '2.0.6'
+    junit_version = '4.13.2'
 }
 
 dependencies {
 
     implementation group: 'uk.co.rgordon', name: 'oddjob', version: oddjob_version
 
-    implementation group: 'log4j', name: 'log4j', version: log4j_version
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: slf4j_version
 
-    api group: 'org.codehaus.groovy', name: 'groovy-all', version: groovy_version
+    api group: 'org.apache.groovy', name: 'groovy-all', version: groovy_version
 
     testImplementation group: 'junit', name: 'junit', version: junit_version
 

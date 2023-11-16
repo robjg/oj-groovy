@@ -4,8 +4,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.oddjob.arooa.ArooaSession;
+import org.slf4j.Logger;
 
 /**
  * 
