@@ -17,7 +17,12 @@ import org.oddjob.arooa.life.ArooaSessionAware;
 
 /**
  * @oddjob.description A Groovy expression.
- * 
+ *
+ * @oddjob.example Evaluate a simple expression. A Groovy expression is held in a Variable and
+ * evaluated during the running of the Echo job.
+ *
+ * {@oddjob.xml.resource org/oddjob/groovy/GroovyExpressionSimple.xml}
+ *
  * @author rob
  *
  */
@@ -27,35 +32,40 @@ public class GroovyExpression implements ArooaValue, ArooaSessionAware {
 		
 		public void registerWith(ConversionRegistry registry) {
 			registry.registerJoker(GroovyExpression.class,
-					new Joker<GroovyExpression>() {
-				public <T> ConversionStep<GroovyExpression, T> lastStep(
-								Class<? extends GroovyExpression> from, 
-								final Class<T> to, 
-								ConversionLookup conversions) {
-					
-					return new ConversionStep<GroovyExpression, T>() {
-						
-						public Class<GroovyExpression> getFromClass() {
-							return GroovyExpression.class;
-						}
-						
-						public Class<T> getToClass() {
-							return to;
-						}
-						
-						public T convert(GroovyExpression from,
-								ArooaConverter converter)
-								throws ArooaConversionException {
-							return converter.convert(from.evaluate(), to);
-						}
-					};
-				}
-			});
+                    new Joker<>() {
+                        public <T> ConversionStep<GroovyExpression, T> lastStep(
+                                Class<? extends GroovyExpression> from,
+                                final Class<T> to,
+                                ConversionLookup conversions) {
+
+                            return new ConversionStep<>() {
+
+                                public Class<GroovyExpression> getFromClass() {
+                                    return GroovyExpression.class;
+                                }
+
+                                public Class<T> getToClass() {
+                                    return to;
+                                }
+
+                                public T convert(GroovyExpression from,
+                                                 ArooaConverter converter)
+                                        throws ArooaConversionException {
+                                    return converter.convert(from.evaluate(), to);
+                                }
+                            };
+                        }
+                    });
 		}
 	}
 	
 	private ArooaSession session;
-	
+
+	/**
+	 * @oddjob.property
+	 * @oddjob.description The expression.
+	 * @oddjob.required No, evaluate to null if missing.
+	 */
 	private String expression;
 	
 	@ArooaHidden

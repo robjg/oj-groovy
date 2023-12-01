@@ -16,12 +16,16 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @oddjob.description Execute a Groovy Script.
- * 
+ * <p>
  * In addition to the <code>osi</code> available to {@link GroovyExpression},
  * The logger is made available to the script with the variable <code>logger</code>
- * and an integer result for this job, which will affect it's completion
+ * and an integer result for this job, which will affect its completion
  * state, can be set by setting the variable <code>oddjobResult</code>.
- * 
+ * </p>
+ *
+ * @oddjob.example Hello World.
+ * {@oddjob.xml.resource org/oddjob/groovy/GroovyJobHello.xml}
+ *
  * @author rob
  *
  */
@@ -32,16 +36,31 @@ public class GroovyJob implements Callable<Integer>, ArooaSessionAware {
 	private OddjobWriteBinding binding;
 	
 	/**
-	 * @oddjob.proeprty
+	 * @oddjob.property
 	 * @oddjob.description The class loader for the script to use.
 	 * @oddjob.required No.
 	 */
 	private ClassLoader classLoader;
-	
+
+	/**
+	 * @oddjob.property
+	 * @oddjob.description The Name of the job.
+	 * @oddjob.required No.
+	 */
 	private String name;
-	
+
+	/**
+	 * @oddjob.property
+	 * @oddjob.description The result of the script if any.
+	 * @oddjob.required Read Only.
+	 */
 	private Object evalResult;
-	
+
+	/**
+	 * @oddjob.property
+	 * @oddjob.description The Groovy script to execute.
+	 * @oddjob.required Yes.
+	 */
 	private String script;
 	
 	@ArooaHidden
